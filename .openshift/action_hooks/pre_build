@@ -1,0 +1,84 @@
+#!/bin/bash
+# This is a simple script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the build step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+# debug
+set -x
+
+pwd
+find ${OPENSHIFT_REPO_DIR}
+find ${OPENSHIFT_DATA_DIR}
+find ${OPENSHIFT_REPO_DIR}
+
+#loads Racket VERSION, INIT_FILE, LOG_FILE, RACKET_COMMAND
+. ${OPENSHIFT_REPO_DIR}.openshift/action_hooks/load_config
+
+if [[ ! $? -eq 0 ]]; then
+    exit $?
+fi
+
+RACKET_PATH="racket-$VERSION/"
+
+# use tmp file just in case it hangs up
+RACKET_ARCH="${OPENSHIFT_TMP_DIR}racket-$VERSION.sh"
+
+cd "$OPENSHIFT_DATA_DIR"
+
+if [[ -d $RACKET_PATH ]]; then
+    echo "Racket $VERSION is installed at `pwd`/$RACKET_PATH"
+else
+
+    echo "Installing Racket $VERSION"
+
+    if [[ -f $RACKET_ARCH ]]; then
+	rm $RACKET_ARCH
+    fi
+
+    RACKET_URL="http://download.racket-lang.org/installers/$VERSION/racket/racket-$VERSION-bin-x86_64-linux-f14.sh"
+    curl -o $RACKET_ARCH $RACKET_URL
+
+    if [[ ! -f $RACKET_ARCH ]]; then
+	echo "Error downloading Racket $VERSION from $RACKET_URL"
+	exit 1
+    fi
+
+    ./"$RACKET_ARCH" <<EOF
+no
+4
+
+EOF
+
+    # rm $RACKET_ARCH
+
+    RACKET_FULL_PATH="${OPENSHIFT_DATA_DIR}${RACKET_PATH}"
+
+    if [[ ! -d $RACKET_FULL_PATH ]]; then
+	echo "Error installing Racket $VERSION to $RACKET_FULL_PATH"
+	exit 1
+    fi
+
+#verify that the desired version installed successfully
+    if [[ ! `${RACKET_FULL_PATH}racket -v | tail -1` = "Welcome to Racket v$VERSION" ]]; then
+	echo "Error installing Racket $VERSION to $RACKET_FULL_PATH"
+	rm -fr $RACKET_FULL_PATH
+	exit 1
+    fi
+
+#cleanup, remove other Racket versions
+    for old in [racket-]*; do
+# avoid showing "Removing version [racket-]*" message
+	if [[ -d $old ]]; then
+	    if [[ $old = "racket-$VERSION" ]]; then
+		echo "Skipping current version version $old"
+	    else
+		echo "Removing version $old"
+		rm -fr $old
+	    fi
+	fi
+    done
+
+fi
+
+exit 0

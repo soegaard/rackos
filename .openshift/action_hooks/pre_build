@@ -7,7 +7,7 @@
 # debug
 # set -x
 
-echo "PWD"
+echo "$PWD"
 
 echo "$OPENSHIFT_DATA_DIR"
 
@@ -24,8 +24,6 @@ RACKET_PATH="racket-$VERSION/"
 
 # use tmp file just in case it hangs up
 RACKET_ARCH="${OPENSHIFT_TMP_DIR}racket-$VERSION.sh"
-
-cd "$OPENSHIFT_DATA_DIR"
 
 if [[ -d $RACKET_PATH ]]; then
     echo "Racket $VERSION is installed at `pwd`/$RACKET_PATH"

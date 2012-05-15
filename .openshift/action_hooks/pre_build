@@ -7,10 +7,11 @@
 # debug
 set -x
 
-pwd
-find ${OPENSHIFT_REPO_DIR}
-find ${OPENSHIFT_DATA_DIR}
-find ${OPENSHIFT_REPO_DIR}
+echo "PWD"
+
+echo "$OPENSHIFT_DATA_DIR"
+
+echo "$OPENSHIFT_TMP_DIR"
 
 #loads Racket VERSION, INIT_FILE, LOG_FILE, RACKET_COMMAND
 . ${OPENSHIFT_REPO_DIR}.openshift/action_hooks/load_config
@@ -32,6 +33,7 @@ else
 
     echo "Installing Racket $VERSION"
 
+    echo "Removing $RACKET_ARCh"
     if [[ -f $RACKET_ARCH ]]; then
 	rm $RACKET_ARCH
     fi
@@ -66,9 +68,9 @@ EOF
 	exit 1
     fi
 
-#cleanup, remove other Racket versions
+    #cleanup, remove other Racket versions
     for old in [racket-]*; do
-# avoid showing "Removing version [racket-]*" message
+    # avoid showing "Removing version [racket-]*" message
 	if [[ -d $old ]]; then
 	    if [[ $old = "racket-$VERSION" ]]; then
 		echo "Skipping current version version $old"

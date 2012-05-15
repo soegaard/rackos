@@ -5,7 +5,7 @@
 # could be python, php, ruby, etc.
 
 # debug
-set -x
+# set -x
 
 echo "PWD"
 
@@ -33,7 +33,7 @@ else
 
     echo "Installing Racket $VERSION"
 
-    echo "Removing $RACKET_ARCh"
+    echo "Removing $RACKET_ARCH"
     if [[ -f $RACKET_ARCH ]]; then
 	rm $RACKET_ARCH
     fi

@@ -26,7 +26,7 @@ do_start()
 {
     CMD=$NAME
     WSARG="-I scheme/init -l- web-server/main.rkt"
-    nohup ${CMD} ${WSARG} ${DAEMON_ARGS} > /dev/null 2>racket_launch_errors.log &
+    nohup ${CMD} ${WSARG} ${DAEMON_ARGS} > /dev/null 2>${OPENSHIFT_LOG_DIR}/racket_launch_errors.log &
     echo $! >> ${PIDFILE}
 }
 
